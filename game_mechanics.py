@@ -1,7 +1,4 @@
-from random import shuffle
-from random import seed
-
-seed()
+import random
 
 class Game:
     def __init__(self, players):
@@ -45,10 +42,8 @@ class Game:
         fewest_turns = min([player.turns for player in best_players])
         winners = [player for player in best_players if player.turns == fewest_turns]
         winner_names = []
-        print("Winners:")
         for player in winners:
             winner_names.append(player.name)
-            print(player.name)
         return winner_names
 
     def scores(self):
@@ -63,9 +58,9 @@ class Game:
                                        silver=player.silver,
                                        copper=player.copper,
                                        )
-            print(f"{player.name} VP: {player.vp}, Turns: {player.turns}, "
-                  f"P: {player.province}, D: {player.duchy}, E: {player.estate}, "
-                  f"G: {player.gold}, S: {player.silver}, C: {player.copper}")
+            # print(f"{player.name} VP: {player.vp}, Turns: {player.turns}, "
+            #       f"P: {player.province}, D: {player.duchy}, E: {player.estate}, "
+            #       f"G: {player.gold}, S: {player.silver}, C: {player.copper}")
         return result
 
     def play(self):
@@ -109,7 +104,7 @@ class Player:
         self.province = 0
 
         self.deck = [0]*3 + [1]*7
-        shuffle(self.deck)
+        random.shuffle(self.deck)
         self.hand = []
         self.discard_pile = []
 
@@ -135,7 +130,7 @@ class Player:
     def reshuffle(self):
         assert len(self.deck) == 0
         self.deck = self.discard_pile.copy()
-        shuffle(self.deck)
+        random.shuffle(self.deck)
         self.discard_pile = []
 
     def buy(self, action):
@@ -174,42 +169,3 @@ class Player:
             pass
         else:
             raise Exception("No action implemented")
-
-def strat1(player_state):
-    # print(player_state)
-    coins = sum(player_state["hand"])
-    if coins >= 8:
-        if player_state["game_province"] > 0:
-            return "province"
-
-        else:
-            return "gold"
-    elif coins >= 6:
-        return "gold"
-    elif coins >= 5:
-        if player_state["game_duchy"] > 0:
-            return "duchy"
-        else:
-            return "silver"
-    elif coins >= 3:
-        return "silver"
-    else:
-        return "none"
-
-results = {}
-repeats = 10
-for i in range(repeats):
-    p1 = Player("p1", strat1)
-    p2 = Player("p2", strat1)
-    players = [p1, p2]
-    game = Game(players)
-    winners, scores = game.play()
-
-    winners = tuple(winners)
-    print("w", winners)
-    if winners in results.keys():
-        results[winners] += 1
-    else:
-        results[winners] = 1
-
-print(results)
